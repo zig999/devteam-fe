@@ -8,10 +8,11 @@ Sistema de agentes autônomos para [Claude Code](https://docs.anthropic.com/en/d
 
 ## Como funciona
 
-O sistema é composto por dois times de agentes que trabalham em sequência:
+O sistema é composto por dois times de agentes com dois fluxos possíveis:
 
 ```
-/context → /ux → /dev
+Feature completa:  /context → /ux → /dev
+Melhoria rápida:   /improve → /dev          (UX opcional no frontend)
 ```
 
 ### Time UX
@@ -29,7 +30,7 @@ Cinco agentes com perspectivas radicalmente diferentes analisam o briefing de fo
 
 ### Time Dev
 
-Recebe o `ux.md` e executa o ciclo de desenvolvimento:
+Recebe o `ux.md` (feature completa) ou `improve##.md` (melhorias incrementais) e executa o ciclo de desenvolvimento:
 
 | Agente | Papel |
 |--------|-------|
@@ -76,29 +77,33 @@ Preencha os dois arquivos no projeto onde os agentes foram instalados:
 - **`CLAUDE.md`** — Stack, arquitetura e convenções do projeto
 - **`WORKSPACE.md`** — Defina o `WORK_DIR` (pasta onde os artefatos serão gerados)
 
-### 2. Gerar o contexto da feature
+### 2a. Fluxo Feature completa
 
 ```
 /context docs/features/nome-da-feature
 ```
-
 Entrevista guiada que coleta requisitos e gera o `context.md`.
-
-### 3. Executar o Time UX
 
 ```
 /ux docs/features/nome-da-feature
 ```
-
 Gera propostas de UX, apresenta 3 direções e, após escolha humana, produz o `ux.md`.
-
-### 4. Executar o Time Dev
 
 ```
 /dev docs/features/nome-da-feature
 ```
-
 Lê o `ux.md`, gera o backlog e executa o ciclo de desenvolvimento completo.
+
+### 2b. Fluxo Melhoria incremental
+
+```
+/improve
+```
+Questionário rápido que coleta melhorias e gera `improve##.md`. Ao final, pergunta se há mudanças visuais:
+- **Com UX** (frontend): `/improve` → `/ux` → `/dev`
+- **Sem UX** (frontend ou backend): `/improve` → `/dev`
+
+O `/dev` detecta automaticamente os `improve##.md` e opera em **modo improve** — gera backlog enxuto direto das melhorias, sem exigir `ux.md`.
 
 ---
 
@@ -134,8 +139,9 @@ Todos os arquivos são salvos no `WORK_DIR` configurado:
 
 ```
 {WORK_DIR}/
-├── context.md                 # Briefing da feature (você cria via /context)
-├── ux.md                      # Entregável do Time UX → entrada do Time Dev
+├── context.md                 # Briefing da feature (via /context)
+├── improve##.md               # Melhorias incrementais (via /improve)
+├── ux.md                      # Entregável do Time UX → entrada do Time Dev (opcional em modo improve)
 ├── ux-proposals.md            # 3 direções de produto apresentadas
 ├── ux-debate.md               # Registro de decisões de design
 ├── backlog.md                 # Epics e User Stories
@@ -159,7 +165,7 @@ Todos os comandos suportam retomada. Se a sessão for interrompida, execute o me
 |-------|---------|-----------|
 | context | `/context` | Entrevista guiada para gerar o briefing |
 | bug-report | `/bug-report` | Coleta bugs via questionário guiado |
-| improve | `/improve` | Coleta melhorias incrementais |
+| improve | `/improve` | Coleta melhorias incrementais → conecta ao `/dev` (com ou sem UX) |
 | planning | — | Templates de backlog (uso interno do Planner) |
 | ux-quality | — | Critérios de qualidade UX (uso interno do Time UX) |
 | development | — | Padrões de implementação (uso interno do Developer) |

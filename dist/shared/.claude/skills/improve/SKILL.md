@@ -121,4 +121,38 @@ _Via: skill-improve (questionário guiado)_
 - Após salvar todas as melhorias, exibir um resumo consolidado:
   - Total de melhorias registradas na sessão
   - Lista dos arquivos criados
-- Após o resumo, exibir o próximo comando a executar: `/dev {WORK_DIR}`
+- Após o resumo, executar o **fluxo de próximo passo** descrito abaixo
+
+---
+
+## Fluxo de próximo passo
+
+Após todas as melhorias confirmadas e salvas, pergunte:
+
+```
+Alguma dessas melhorias envolve mudanças visuais significativas
+(layout, fluxo de tela, interação nova)?
+
+1. Sim — quero passar pelo Time UX antes do desenvolvimento
+2. Não — ir direto para o desenvolvimento
+3. Não sei — decidir depois
+```
+
+### Se **1 (Sim)**:
+```
+Próximos passos:
+1. /ux {WORK_DIR}  — gera propostas de UX considerando as melhorias
+2. /dev {WORK_DIR} — executa o desenvolvimento a partir do ux.md gerado
+
+Execute: /ux {WORK_DIR}
+```
+
+### Se **2 (Não)** ou **3 (Não sei)**:
+```
+Próximo passo:
+/dev {WORK_DIR} — o Planner vai gerar o backlog diretamente a partir das melhorias
+
+Execute: /dev {WORK_DIR}
+```
+
+> **Nota:** o `/dev` detecta automaticamente a presença de `improve##.md` e opera em **modo improve** — não exige `ux.md` quando há melhorias registradas.
